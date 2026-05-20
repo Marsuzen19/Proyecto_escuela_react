@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+
 //importe de boostrap que instale de git, se pone arriba del css
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
