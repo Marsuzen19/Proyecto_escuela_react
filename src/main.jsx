@@ -1,8 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-//importe de boostrap que instale de git, se pone arriba del css
+// Importes de Bootstrap (Primero CSS, luego el JS para los componentes interactivos)
 import 'bootstrap/dist/css/bootstrap.min.css'
+//para que funcione el despliegue
+import 'bootstrap/dist/js/bootstrap.bundle.min.js' 
+
 import './index.css'
 import App from './App.jsx'
 

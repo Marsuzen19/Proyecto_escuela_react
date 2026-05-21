@@ -10,9 +10,11 @@ const AlumnoForm = ({ recargarAlumnos }) => {
     direccion: '',
     telefono: '',
     email: '',
-    estado_matricula: 'Matriculado',
-    foto: null // ✅ NUEVO
+    estado_matricula: 'Matriculado'
   });
+
+  const [foto, setFoto] = useState(null); //  separado
+  const [preview, setPreview] = useState(null); //  preview
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -22,20 +24,35 @@ const AlumnoForm = ({ recargarAlumnos }) => {
     });
   };
 
+  //  Manejo exclusivo de imagen
+  const manejarImagen = (e) => {
+    const file = e.target.files[0];
+    setFoto(file);
+
+    if (file) {
+      setPreview(URL.createObjectURL(file)); // preview
+    }
+  };
+
   const manejarEnvio = async (e) => {
     e.preventDefault();
 
     try {
       const formData = new FormData();
 
-      // ✅ Convertir a FormData
-      for (let key in formulario) {
+      //  Agregar campos
+      Object.keys(formulario).forEach(key => {
         formData.append(key, formulario[key]);
+      });
+
+      //  Solo si hay imagen
+      if (foto) {
+        formData.append('foto', foto);
       }
 
       const respuesta = await fetch('http://127.0.0.1:8000/api/alumnos', {
         method: 'POST',
-        body: formData // ❗ IMPORTANTE (sin headers)
+        body: formData
       });
 
       const datos = await respuesta.json();
@@ -43,6 +60,7 @@ const AlumnoForm = ({ recargarAlumnos }) => {
       if (respuesta.ok) {
         alert('Alumno guardado exitosamente');
 
+        // reset
         setFormulario({
           nombre: '',
           apellido: '',
@@ -51,9 +69,11 @@ const AlumnoForm = ({ recargarAlumnos }) => {
           direccion: '',
           telefono: '',
           email: '',
-          estado_matricula: 'Matriculado',
-          foto: null
+          estado_matricula: 'Matriculado'
         });
+
+        setFoto(null);
+        setPreview(null);
 
         recargarAlumnos();
       } else {
@@ -79,110 +99,68 @@ const AlumnoForm = ({ recargarAlumnos }) => {
 
             <div className="col-md-6">
               <label className="form-label">Nombres</label>
-              <input
-                type="text"
-                className="form-control"
-                name="nombre"
-                value={formulario.nombre}
-                onChange={manejarCambio}
-                required
-              />
+              <input type="text" className="form-control" name="nombre"
+                value={formulario.nombre} onChange={manejarCambio} required />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Apellidos</label>
-              <input
-                type="text"
-                className="form-control"
-                name="apellido"
-                value={formulario.apellido}
-                onChange={manejarCambio}
-                required
-              />
+              <input type="text" className="form-control" name="apellido"
+                value={formulario.apellido} onChange={manejarCambio} required />
             </div>
 
             <div className="col-md-4">
               <label className="form-label">DNI</label>
-              <input
-                type="text"
-                className="form-control"
-                name="dni"
-                value={formulario.dni}
-                onChange={manejarCambio}
-                required
-              />
+              <input type="text" className="form-control" name="dni"
+                value={formulario.dni} onChange={manejarCambio} required />
             </div>
 
             <div className="col-md-4">
               <label className="form-label">Fecha de Nacimiento</label>
-              <input
-                type="date"
-                className="form-control"
-                name="fecha_nacimiento"
-                value={formulario.fecha_nacimiento}
-                onChange={manejarCambio}
-                required
-              />
+              <input type="date" className="form-control" name="fecha_nacimiento"
+                value={formulario.fecha_nacimiento} onChange={manejarCambio} required />
             </div>
 
             <div className="col-md-4">
               <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={formulario.email}
-                onChange={manejarCambio}
-                required
-              />
+              <input type="email" className="form-control" name="email"
+                value={formulario.email} onChange={manejarCambio} required />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Dirección</label>
-              <input
-                type="text"
-                className="form-control"
-                name="direccion"
-                value={formulario.direccion}
-                onChange={manejarCambio}
-              />
+              <input type="text" className="form-control" name="direccion"
+                value={formulario.direccion} onChange={manejarCambio} />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Teléfono</label>
-              <input
-                type="text"
-                className="form-control"
-                name="telefono"
-                value={formulario.telefono}
-                onChange={manejarCambio}
-              />
+              <input type="text" className="form-control" name="telefono"
+                value={formulario.telefono} onChange={manejarCambio} />
             </div>
 
-            {/* ✅ INPUT DE IMAGEN */}
+            {/* IMAGEN */}
             <div className="col-md-6">
               <label className="form-label">Foto</label>
-              <input
-                type="file"
-                className="form-control"
-                name="foto"
-                onChange={(e) =>
-                  setFormulario({
-                    ...formulario,
-                    foto: e.target.files[0]
-                  })
-                }
-              />
+              <input type="file" className="form-control" onChange={manejarImagen} />
             </div>
+
+            {/*  PREVIEW */}
+            {preview && (
+              <div className="col-md-6">
+                <img
+                  src={preview}
+                  alt="preview"
+                  className="img-fluid rounded"
+                  style={{ height: '150px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
 
             <div className="col-md-4">
               <label className="form-label">Estado</label>
-              <select
-                className="form-select"
-                name="estado_matricula"
-                value={formulario.estado_matricula}
-                onChange={manejarCambio}
-              >
+              <select className="form-select" name="estado_matricula"
+                value={formulario.estado_matricula} onChange={manejarCambio}>
                 <option value="Matriculado">Matriculado</option>
                 <option value="Inactivo">Inactivo</option>
               </select>
